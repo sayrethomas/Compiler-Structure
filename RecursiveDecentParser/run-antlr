@@ -1,0 +1,2 @@
+#!/bin/bash
+./Antlr -o src src/Hello.g4

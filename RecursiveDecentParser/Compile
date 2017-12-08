@@ -1,0 +1,2 @@
+#!/bin/bash
+./javac -cp lib/*.jar -d build/classes -s src $(find src -name '*.java')
