@@ -1,0 +1,83 @@
+%option noyywrap
+
+%{
+#include <iostream>
+#include <assert.h>
+#include <string.h>
+#include <map>
+#include "example1.hpp"
+#include "example1.tab.hpp"
+
+#define DEBUG_LEXER 1
+%}
+
+%%
+[0-9]+\.[0-9]+ {
+  yylval = node(atof(yytext));
+#if DEBUG_LEXER == 1
+  std::cout << "lexed " << yytext << " as DOUBLE: " << yylval << std::endl;
+#endif
+  return DOUBLE;
+}
+
+[0-9]+ {
+  yylval = node(atoi(yytext));
+#if DEBUG_LEXER == 1
+  std::cout << "lexed " << yytext << " as INTEGER: " << yylval << std::endl;
+#endif
+  return INTEGER;
+}
+
+
+(start|stop) {
+  if (strcmp(yytext, "start") == 0) {
+#if DEBUG_LEXER == 1
+  std::cout << "lexed " << yytext << " as START" << std::endl;
+#endif
+    return START;
+  }
+  if (strcmp(yytext, "stop") == 0) {
+#if DEBUG_LEXER == 1
+  std::cout << "lexed " << yytext << " as STOP" << std::endl;
+#endif
+    return STOP;
+  }
+  assert(0);
+}
+
+[a-z][a-zA-Z0-9]*    {
+  yylval = node(std::string(yytext));
+#if DEBUG_LEXER == 1
+  std::cout << "lexed " << yytext << " as LOWER:" << yylval << std::endl;
+#endif
+  return LOWER;
+}
+
+[A-Z][a-zA-Z0-9]*    {
+  yylval = node(std::string(yytext));
+#if DEBUG_LEXER == 1
+  std::cout << "lexed " << yytext << " as UPPER:" << yylval << std::endl;
+#endif
+  return UPPER;
+}
+
+[ \t]+ {
+#if DEBUG_LEXER == 1
+  std::cout << "lexed " << yytext << " as WS" << std::endl;
+#endif
+  return WS;
+}
+
+\r?\n {
+#if DEBUG_LEXER == 1
+  std::cout << "lexed " << yytext << " as EOL" << std::endl;
+#endif
+  return EOL;
+}
+
+. {
+  std::cout << "syntax error '" << yytext << "'" << std::endl;
+  assert(0);
+}
+
+%%
